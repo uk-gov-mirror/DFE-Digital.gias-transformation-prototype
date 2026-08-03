@@ -1,24 +1,61 @@
 {#
-For guidance on how to use layouts see:
-https://prototype-kit.service.gov.uk/docs/how-to-use-layouts
+  Main layout
+  ===========
+  Default layout for standard pages (Search, Download, and most others).
+  Renders: GOV.UK header → service navigation (Home/Search/Download) →
+  phase banner → page content.
+
+  Pages that need the unified blue masthead header (e.g. the home page)
+  should extend layouts/masthead.html instead.
+
+  For guidance on how to use layouts see:
+  https://prototype-kit.service.gov.uk/docs/how-to-use-layouts
 #}
 
 {% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
 
+{#
+  Override the service navigation so it uses our journey's links.
+  `active` state is driven by each page setting {% set activeNav = "..." %}.
+#}
+{% block govukServiceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: serviceName,
+    serviceUrl: "/home",
+    navigation: [
+      {
+        href: "/home",
+        text: "Home",
+        active: activeNav == "Home"
+      },
+      {
+        href: "/search",
+        text: "Search",
+        active: activeNav == "Search"
+      },
+      {
+        href: "/download",
+        text: "Download",
+        active: activeNav == "Download"
+      }
+    ]
+  }) }}
+{% endblock %}
+
 {% block headerEnd %}
-<div class="govuk-phase-banner govuk-width-container">
-  <p class="govuk-phase-banner__content">
-    <strong class="govuk-tag govuk-phase-banner__content__tag">
-      Prototype
-    </strong>
-    <span class="govuk-phase-banner__text">
-      This is a prototype for a new version of the service. Nothing here is final</a>.
-    </span>
-  </p>
-</div>
+  <div class="govuk-phase-banner govuk-width-container">
+    <p class="govuk-phase-banner__content">
+      <strong class="govuk-tag govuk-phase-banner__content__tag">
+        Prototype
+      </strong>
+      <span class="govuk-phase-banner__text">
+        This is a prototype for a new version of the service. Nothing here is final.
+      </span>
+    </p>
+  </div>
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script src="/assets/js/dfefrontend.min.js"></script>
+  {{ super() }}
+  <script src="/assets/js/dfefrontend.min.js"></script>
 {% endblock %}

@@ -1,183 +1,75 @@
-{% extends "layouts/main.html" %}
+{% extends "layouts/service-index.html" %}
 
-{% set pageName="Home" %}
-
-{% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="https://unpkg.com/accessible-autocomplete/dist/accessible-autocomplete.min.css" />
-{% endblock %}
+{% set pageName = "Prototype" %}
 
 {% block content %}
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
 
-    <h1 class="govuk-heading-xl">
-      Get information about schools register
-    </h1>
+        <span class="govuk-caption-xl">Find education provider information</span>
+        <h1 class="govuk-heading-xl">Prototype</h1>
 
-    <p class="govuk-body">
-      Use this register to search or download publicly available information on educational establishments in England.
-    </p>
-      
-    <p class="govuk-body">
-      This register is also used by Department for Education (DfE) and key partners to contact establishments, update systems, perfrom analysis and inform policy decisons like funding. 
-    </p>
+        <p class="govuk-body-l">
+          This prototype tests a new version of the Get information about schools (GIAS) service, including the proposed name change to 'Find education provider information'.
+        </p>
 
-    <div class="govuk-form-group search--home">
-      <label class="govuk-label govuk-label--l" for="search">
-        Search the register
-      </label>
-      <div id="search-hint" class="govuk-hint">
-        Enter an establishment name, location or UK provider number (UKPRN)
+        {{ govukButton({
+          text: "Start prototype",
+          href: "/home",
+          isStartButton: true
+        }) }}
+
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+        <h2 class="govuk-heading-l no-gap">Version 4.0</h2>
+
+        <p class="govuk-body">
+          3 August 2026
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>Translated designs from Figma</li>
+          <li>Updated content based on user feedback</li>
+        </ul>
+       
+        <h3 class="govuk-heading-m">Key pages</h3>
+
+        <ol class="govuk-list">
+          <li class="inline-list"><a class="govuk-link" href="/home">Home</a></li>
+          <li class="inline-list"><a class="govuk-link" href="/search">Search</a></li>
+          <li class="inline-list"><a class="govuk-link" href="/download">Download</a></li>
+        </ol>
+
       </div>
-      <div style="display: flex; align-items: flex-start; gap: 0px;">
-        <div id="search-autocomplete-container" style="flex: 1;">
-        </div>
-        <button class="govuk-button" style="margin-bottom: 0; height: 48px;" id="search-button">
-          Search
-        </button>
+
+      <div class="govuk-grid-column-two-thirds top-border">
+
+        <h2 class="govuk-heading-l">Previous versions</h2>
+
+        <h3 class="govuk-heading-m no-gap">v3.0</h3>
+
+        <p class="govuk-body-s">
+          14 July 2026
+        </p>
+
+        <p class="govuk-body">
+          <a class="govuk-link" href="https://www.figma.com/proto/Ilas4ou5hoI8CplacBBX8A/GIAS-Prototype-v3?node-id=118-5777&viewport=405%2C471%2C0.27&t=JvIqn1NyV3kHE47J-8&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=118%3A5777&show-proto-sidebar=1&page-id=91%3A4313&disable-default-keyboard-nav=1&hide-ui=1">Figma prototype</a>
+          <br>
+          Password:TheGreatWhen
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>Used homepage with cards for search and download</li>
+          <li>Download flow reduced in complexity</li>
+          <li>More filters included in search results page</li>
+          <li>Updated content based on user feedback</li>
+        </ul>
+
+
       </div>
-      <p class="govuk-body" style="padding-top: 5px;">
-        <a href="/all" class="govuk-link">View all establishments</a>
-      </p>
     </div>
-
-    <p class="govuk-body">
-      Looking for a closed establishment? <a href="/archive" class="govuk-link">Search the archive</a>.
-    </p>
-
   </div>
-</div>
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-    
-    <h2 class="govuk-heading-l">
-      Download information from the register
-    </h2>
-    
-    <p class="govuk-body">
-      Download publicly available information as CSV files, or request access to our API.
-    </p>
-    <!--<p class="govuk-body">
-      Ideal for users who want to perform their own analysis, maintain up-to-date information, or make use of this information in their own services.
-    </p>-->
-    <p class="govuk-body">
-      <a href="#" class="govuk-link">Download information from the register</a>
-    </p>
-    <!--<div class="govuk-inset-text">
-      Did you know you can also download information from search results?
-    </div>-->
-  </div>
-</div>
-
-<!--
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible section-break--blue">
-    
-    <h2 class="govuk-heading-m">
-      Looking for more information?
-    </h2>
-    
-    <p class="govuk-body">
-      For more in-depth information about schools and school groups, including:
-    </p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>contact information</li>
-      <li>school features</li>
-      <li>policies</li>
-      <li>performance data</li>
-    </ul>
-    <p class="govuk-body">
-      please visit our new service, <a class="govuk-link" href="#">School Profiles</a>.
-    </p>
-  </div>
-</div>
-
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-    
-    <h2 class="govuk-heading-m">
-      Interested in other areas of the United Kingdom?
-    </h2>
-
-    <p class="govuk-body">
-      Visit the following links for:
-    </p>
-    
-    <ul class="govuk-list govuk-list">
-      <li><a class="govuk-link" href="https://education.gov.scot/">Scotland</a></li>
-      <li><a class="govuk-link" href="https://mylocalschool.gov.wales/">Wales</a></li>
-      <li><a class="govuk-link" href="https://apps.education-ni.gov.uk/appinstitutes/default.aspx">Northern Ireland</a></li>
-    </ul>
-
-  </div>
-</div>
--->
-
-{% endblock %}
-
-{% block pageScripts %}
-<script src="https://unpkg.com/accessible-autocomplete/dist/accessible-autocomplete.min.js"></script>
-<script>
-  accessibleAutocomplete({
-    element: document.querySelector('#search-autocomplete-container'),
-    id: 'search',
-    name: 'term',
-    minLength: 2,
-    showNoOptionsFound: true,
-    menuAttributes: {
-      'aria-labelledby': 'search-hint'
-    },
-    source: function (query, populateResults) {
-      fetch('/api/schools?q=' + encodeURIComponent(query))
-        .then(function (response) { return response.json() })
-        .then(function (data) {
-          populateResults(data)
-        })
-    },
-    onConfirm: function (confirmed) {
-      if (!confirmed) return
-      var match = confirmed.match(/\((?:URN|UID):\s*(\d+)\)/)
-      if (match) {
-        window.location.href = '/establishment/' + match[1] + '?from=/index'
-      } else {
-        window.location.href = '/results?q=' + encodeURIComponent(confirmed)
-      }
-    }
-  })
-
-  // Handle free-text search on enter key without selecting from autocomplete
-  document.querySelector('#search').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      var val = this.value.trim()
-      if (val.length > 0) {
-        // Check if it looks like an autocomplete selection (contains URN/UID)
-        var match = val.match(/\((?:URN|UID):\s*(\d+)\)/)
-        if (match) {
-          window.location.href = '/results?id=' + match[1]
-        } else {
-          window.location.href = '/results?q=' + encodeURIComponent(val)
-        }
-      }
-    }
-  })
-
-  // Search button
-  document.querySelector('#search-button').addEventListener('click', function () {
-  var val = document.querySelector('#search').value.trim()
-  if (val.length > 0) {
-    var match = val.match(/\((?:URN|UID):\s*(\d+)\)/)
-    if (match) {
-      window.location.href = '/results?id=' + match[1]
-    } else {
-      window.location.href = '/results?q=' + encodeURIComponent(val)
-    }
-  }
-})
-</script>
 {% endblock %}

@@ -1,0 +1,96 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set pageName = "Download complete" %}
+{% set activeNav = "Download" %}
+
+{#********************#}
+{# Map stored selection codes to readable labels. #}
+{#********************#}
+
+{% set scope = data['download-scope'] %}
+{% set scopeText = {
+  "all": "All information",
+  "specific": "Selected data",
+  "updates": "Updates only"
+}[scope] or "All information" %}
+
+{% set versionText = {
+  "latest": "Latest version",
+  "earlier": "Version from an earlier date"
+}[data['download-version']] %}
+
+{% set formatText = {
+  "csv": "CSV",
+  "json": "JSON",
+  "xlsx": "XLSX (Excel)"
+}[data['download-format']] or "CSV" %}
+
+{% set sizeText = {
+  "all": "345 MB",
+  "specific": "Varies by selection",
+  "updates": "Varies by date"
+}[scope] or "345 MB" %}
+
+{#********************#}
+{# Build a filename from the selection #}
+{#********************#}
+
+{% set scopeFilePart = {
+  "all": "All_Data",
+  "specific": "Selected_Data",
+  "updates": "Updates"
+}[scope] or "All_Data" %}
+{% set fileName = "FEPI-" + scopeFilePart + "-2026_07_13.zip" %}
+
+{#********************#}
+{# Build summary rows. Version row only included if user chose a version #}
+{#********************#}
+
+{%- set rows = [{ key: { text: "Data" }, value: { text: scopeText } }] -%}
+{%- if versionText -%}
+  {%- set rows = rows.concat([{ key: { text: "Version" }, value: { text: versionText } }]) -%}
+{%- endif -%}
+{%- set rows = rows.concat([{ key: { text: "Format" }, value: { text: formatText } }]) -%}
+{%- set rows = rows.concat([{ key: { text: "File size" }, value: { text: sizeText } }]) -%}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {{ govukPanel({
+        titleText: "Download complete",
+        html: "Your file<br><strong>" + fileName + "</strong>"
+      }) }}
+
+      <p class="govuk-body">
+        Your file <strong>{{ fileName }}</strong> has downloaded.
+        <br>
+        Check your browser's downloads folder to open it.
+      </p>
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-8">What you have downloaded</h2>
+      {{ govukSummaryList({
+        rows: rows
+      }) }}
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-8">What you can do now</h2>
+      <ul class="govuk-list govuk-list--spaced">
+        <li><a class="govuk-link govuk-link--no-visited-state" href="/download">Download another extract</a></li>
+        <li><a class="govuk-link govuk-link--no-visited-state" href="/home">Return to the service home page</a></li>
+      </ul>
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-8">Using this data</h2>
+      <p class="govuk-body">
+        This data is available under the
+        <a class="govuk-link" href="#" rel="noreferrer noopener" target="_blank">Open Government Licence v3.0 (opens in a new tab)</a>.
+        You can use and reuse it, provided you follow the licence terms.
+      </p>
+
+    </div>
+  </div>
+
+{% endblock %}

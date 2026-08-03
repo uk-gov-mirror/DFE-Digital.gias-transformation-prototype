@@ -1,0 +1,88 @@
+{#
+  Masthead layout
+  ===============
+  For key landing pages that show the x-govuk masthead as part of a unified
+  blue header block: GOV.UK header → inverse service navigation → inverse
+  masthead. Other pages should extend layouts/main.html instead.
+
+  The x-govuk masthead documentation says to place the service navigation
+  directly above the masthead and give it the `govuk-service-navigation--inverse`
+  modifier so the two read as a single section. We therefore override the whole
+  `header` block so we control the order precisely.
+
+  Pages using this layout set the masthead content via variables:
+    {% set mastheadTitle = "..." %}          (required)
+    {% set mastheadDescription = "..." %}    (optional)
+    {% set activeNav = "Home" %}             (optional, highlights the nav item)
+  and, optionally, a start button:
+    {% set mastheadStartButtonText = "..." %}
+    {% set mastheadStartButtonHref = "..." %}
+#}
+
+{% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
+
+{% from "node_modules/@x-govuk/govuk-prototype-components/src/x-govuk/components/masthead/macro.njk" import xGovukMasthead %}
+
+{% block header %}
+  {#
+    Rebuild the header region so the masthead joins the header and service
+    navigation as one continuous block. We do not call super(): we render each
+    piece explicitly in the required order.
+  #}
+
+  {# 1. Standard GOV.UK header (crown logo, rebranded via config.json) #}
+  {{ govukHeader({
+    homepageUrl: "/",
+    containerClasses: "govuk-width-container"
+  }) }}
+
+  {# 2. Service navigation, inverse so it sits on the blue block #}
+  {{ govukServiceNavigation({
+    classes: "govuk-service-navigation--inverse",
+    serviceName: serviceName,
+    serviceUrl: "/home",
+    navigation: [
+      {
+        href: "/home",
+        text: "Home",
+        active: activeNav == "Home"
+      },
+      {
+        href: "/search",
+        text: "Search",
+        active: activeNav == "Search"
+      },
+      {
+        href: "/download",
+        text: "Download",
+        active: activeNav == "Download"
+      }
+    ]
+  }) }}
+
+  {# 3. Inverse masthead, with the prototype phase banner tucked inside it #}
+  {{ xGovukMasthead({
+    inverse: true,
+    phaseBanner: {
+      tag: {
+        text: "Prototype"
+      },
+      html: "This is a prototype for a new version of the service. Nothing here is final."
+    },
+    title: {
+      text: mastheadTitle
+    },
+    description: {
+      text: mastheadDescription
+    } if mastheadDescription,
+    startButton: {
+      text: mastheadStartButtonText,
+      href: mastheadStartButtonHref
+    } if mastheadStartButtonText
+  }) }}
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="/assets/js/dfefrontend.min.js"></script>
+{% endblock %}

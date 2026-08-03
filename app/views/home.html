@@ -1,0 +1,183 @@
+{% extends "layouts/masthead.html" %}
+
+{% from "node_modules/dfe-frontend/packages/components/card/macro.njk" import card %}
+
+{% set pageName = "Home" %}
+{% set activeNav = "Home" %}
+
+{#
+  Masthead content is rendered by layouts/masthead.html using these variables.
+  No start button on the home page.
+#}
+{% set mastheadTitle = "Find education provider information" %}
+{% set mastheadDescription = "The Department for Education's official register of education providers, provider groups and governors in England" %}
+
+{% block content %}
+
+  <!-- Inset yexy - yellow highlight -->
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <div class="govuk-inset-text inset-yellow">
+        <h3 class="govuk-notification-banner__heading">
+          This service is replacing Get Information About Schools (GIAS)
+        </h3>
+        <p>You can continue to use GIAS until <span class="govuk-!-font-weight-bold">26 July 2027</span> at <a class="govuk-link" href="#">getinformationaboutschools.service.gov.uk</a>.
+        </p>
+
+        <p>
+            If you're looking for detailed information about individual schools, use <a class="govuk-link govuk-link--no-visited-state" href="#">School Profiles</a>. The service provides more detailed school information and lets you compare schools.
+          </p>
+
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Why is GIAS being replaced?
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <p>
+            This new service focuses on providing an accurate and authoritative register of education providers, provider groups and governors in England. It has been designed to improve data quality, respond more easily to changes in data and policy requirements, and provide better access to education provider data.
+            </p>
+            <p>
+            People looking for detailed information about individual schools can use School Profiles, which has been designed specifically to meet those needs.
+            </p>
+          </div>
+        </details>
+        
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <div class="dfe-home-cards">
+      {{ card({
+        cards: [
+          {
+            "imageCard": false,
+            "imagePath": "",
+            "altText": "",
+            "headingLevel": "2",
+            "linkCard": true,
+            "link": "/search",
+            "openInNewTab": false,
+            "heading": "Search the register",
+            "description": "Search education providers, provider groups and governors.",
+            "meta": ""
+          },
+          {
+            "imageCard": false,
+            "imagePath": "",
+            "altText": "",
+            "headingLevel": "2",
+            "linkCard": true,
+            "link": "/download",
+            "openInNewTab": false,
+            "heading": "Download information",
+            "description": "Download education provider, provider group and governance information.",
+            "meta": ""
+          }
+        ]
+      }) }}
+      </div>
+
+      <!-- QUICK SEARCH -->
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">Quick search</h2>
+
+      <ul class="govuk-list govuk-!-margin-bottom-0 dfe-quick-search-list">
+        <li>
+          <a class="govuk-link govuk-link--no-visited-state" href="/results?q=*">
+            Show all records 
+            <svg class="dfe-quick-search-list__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 17 17" aria-hidden="true" focusable="false">
+              <path d="M0 0h13l20 20-20 20H0l20-20z" fill="currentColor" transform="scale(0.4)" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="govuk-link govuk-link--no-visited-state" href="/results?q=*&amp;kind=provider">
+            Show only education providers
+            <svg class="dfe-quick-search-list__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 17 17" aria-hidden="true" focusable="false">
+              <path d="M0 0h13l20 20-20 20H0l20-20z" fill="currentColor" transform="scale(0.4)" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="govuk-link govuk-link--no-visited-state" href="/results?q=*&amp;kind=group">
+            Show only education provider groups
+            <svg class="dfe-quick-search-list__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 17 17" aria-hidden="true" focusable="false">
+              <path d="M0 0h13l20 20-20 20H0l20-20z" fill="currentColor" transform="scale(0.4)" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    
+    </div>
+
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--xl">
+    </div>
+  </div>
+
+  <!-- RELATED SERVICES -->
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h2 class="govuk-heading-l">Related DfE services</h2>
+
+      <h3 class="govuk-heading-m">Parents and carers</h3>
+
+      <p class="govuk-body">
+        If you're a parent or carer and want to know about a specific school or want to compare schools, you should now use the
+        <a class="govuk-link" href="#">School Profiles service</a>.
+      </p>
+
+      <p class="govuk-body">
+        For inspection reports, use the
+        <a class="govuk-link" href="#">Ofsted website</a>.
+      </p>
+
+      <h3 class="govuk-heading-m">Schools and other education providers</h3>
+
+      <p class="govuk-body">
+        If you are looking for comparitive information of schools, we recommend using the
+        <a class="govuk-link" href="#">School Profiles service</a>.
+      </p>
+    
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--xl">
+    </div>
+  </div>
+
+  <!-- EDUCATION PROVIDER LINKS -->
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-two-thirds">
+
+      <h2 class="govuk-heading-l">Education providers in the rest of the United Kingdom</h2>
+
+      <p class="govuk-body">
+        <a class="govuk-link" href="https://www.education-ni.gov.uk/">Department of Education Northern Ireland</a>
+      </p>
+      <p class="govuk-body">
+        <a class="govuk-link" href="https://education.gov.scot/">Education Scotland</a>
+      </p>
+      <p class="govuk-body">
+        <a class="govuk-link" href="https://www.gov.wales/education-skills">Wales Education Directorate</a>
+      </p>
+
+    </div>
+
+  </div>
+
+{% endblock %}

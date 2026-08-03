@@ -1,163 +1,374 @@
 {% extends "layouts/main.html" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
 
 {% set pageName = item.name %}
+{% set activeNav = "Search" %}
+
+{% set isGroup = (item.id_type === 'UID' or item.id_type === 'Group UID') %}
 
 {% block beforeContent %}
-  <nav aria-label="Breadcrumb navigation">
-    
-    <a href="/index" class="home-link">Home</a>
-
-    {% if backLink != '/results' %}
-      {{ govukBackLink({
-        text: "Back to results",
-        href: backLink
-      }) }}
-    {% endif %}
-
-  </nav>
+  {{ govukBreadcrumbs({
+    items: [
+      { text: "Home", href: "/home" },
+      { text: "Search", href: "/search" },
+      { text: "Search results", href: backLink }
+    ]
+  }) }}
 {% endblock %}
 
-{% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+{#
+  ===========================================================================
+  DETAILS PANEL
+  Built as a summary list from the record's fields. Shared helper markup for
+  both providers and groups; the fields shown differ by record type.
+  ===========================================================================
+#}
+{% set detailsHtml %}
+  <h2 class="govuk-heading-m">Details</h2>
+  <dl class="govuk-summary-list">
 
-    <span class="govuk-caption-l">{{ item.type }}</span>
-    <h1 class="govuk-heading-l">{{ item.name }}</h1>
-    
-    {% if item.id_type === 'URN' %}
-        <p class="govuk-body govuk-!-margin-bottom-0">
-          <strong class="small-tag small-tag--green">Data verified</strong>
-        </p>
-    {% elif item.id_type === 'UID' or item.id_type === 'Group UID' %}
-        <p class="govuk-body govuk-!-margin-bottom-0">
-          <strong class="small-tag small-tag--yellow">Not updated since 16 April 2024</strong>
-        </p>
-    {% endif %}
-
-    <dl class="govuk-summary-list">
-
-      {% for field in item.display_fields %}
-
-        {% if field === 'type' %}
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Type</dt>
-            <dd class="govuk-summary-list__value">{{ item.type }}</dd>
-          </div>
-
-        {% elif field === 'status' %}
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Status</dt>
-            <dd class="govuk-summary-list__value">{{ item.status }}</dd>
-          </div>
-
-        {% elif field === 'open_date' %}
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Opened</dt>
-            <dd class="govuk-summary-list__value">{{ item.open_date if item.open_date else 'Not recorded' }}</dd>
-          </div>
-
-        {% elif field === 'local_authority' %}
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Local authority</dt>
-            <dd class="govuk-summary-list__value">{{ item.local_authority if item.local_authority else 'Not recorded' }}</dd>
-          </div>
-
-        {% elif field === 'sen_provision' %}
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">SEN provision</dt>
-            <dd class="govuk-summary-list__value">{{ 'Yes' if item.sen_provision else 'No' }}</dd>
-          </div>
-
-        {% elif field === 'part_of' %}
-          {% if item.part_of %}
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">Part of</dt>
-              <dd class="govuk-summary-list__value">
-               <a class="govuk-link" href="/establishment/{{ item.part_of.group_uid }}?from={{ backLink | urlencode }}">{{ item.part_of.group_name }}</a>
-                (UID: {{ item.part_of.group_uid }})
-              </dd>
-            </div>
-          {% endif %}
-
-        {% endif %}
-
-      {% endfor %}
-
+    {% if isGroup %}
+      {# Group details #}
       <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">{{ item.id_type }}</dt>
+        <dt class="govuk-summary-list__key">UID</dt>
         <dd class="govuk-summary-list__value">{{ item.id }}</dd>
       </div>
+      {% if item.group_id %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Group ID</dt>
+          <dd class="govuk-summary-list__value">{{ item.group_id }}</dd>
+        </div>
+      {% endif %}
+      {% if item.ukprn %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">UKPRN</dt>
+          <dd class="govuk-summary-list__value">{{ item.ukprn }}</dd>
+        </div>
+      {% endif %}
+      {% if item.companies_house_number %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Company number</dt>
+          <dd class="govuk-summary-list__value">
+            <a class="govuk-link" href="#" rel="noreferrer noopener" target="_blank">{{ item.companies_house_number }} (opens in new tab)</a>
+          </dd>
+        </div>
+      {% endif %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Status</dt>
+        <dd class="govuk-summary-list__value">
+          {{ item.status }}{% if item.open_date %} on {{ item.open_date }}{% endif %}
+        </dd>
+      </div>
+      {% if item.postcode or item.street or item.town %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Address</dt>
+          <dd class="govuk-summary-list__value">
+            {{ [item.street, item.town, item.county, item.postcode] | select | join(", ") }}
+          </dd>
+        </div>
+      {% endif %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Type</dt>
+        <dd class="govuk-summary-list__value">{{ item.type }}</dd>
+      </div>
 
-    </dl>
-
-    {% if item.id_type === 'URN' %}
-      <p class="govuk-body govuk-!-margin-top-6">
-        <a href="/school-profiles/about-the-school" class="govuk-link" target="_blank" rel="noopener noreferrer">
-          View more information about this school on School Profiles (opens in new tab)
-        </a>
-      </p>
-      <p class="govuk-body govuk-!-margin-top-6">
-        <a href="#" class="govuk-link" >
-          Download establishment information
-        </a>
-      </p>
+    {% else %}
+      {# Provider details #}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">URN</dt>
+        <dd class="govuk-summary-list__value">{{ item.id }}</dd>
+      </div>
+      {% if item.ukprn %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">UKPRN</dt>
+          <dd class="govuk-summary-list__value">{{ item.ukprn }}</dd>
+        </div>
+      {% endif %}
+      {% if item.dfe_number %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">DfE Number</dt>
+          <dd class="govuk-summary-list__value">{{ item.dfe_number }}</dd>
+        </div>
+      {% endif %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Status</dt>
+        <dd class="govuk-summary-list__value">
+          {{ item.status }}{% if item.open_date %} on {{ item.open_date }}{% endif %}
+        </dd>
+      </div>
+      {% if item.postcode or item.street or item.town %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Address</dt>
+          <dd class="govuk-summary-list__value">
+            {{ [item.street, item.town, item.county, item.postcode] | select | join(", ") }}
+          </dd>
+        </div>
+      {% endif %}
+      {% if item.local_authority %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Local authority</dt>
+          <dd class="govuk-summary-list__value">{{ item.local_authority }}</dd>
+        </div>
+      {% endif %}
+      {% if item.part_of %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Part of a group</dt>
+          <dd class="govuk-summary-list__value">
+            <a class="govuk-link" href="/establishment/{{ item.part_of.group_uid }}?from={{ backLink | urlencode }}">{{ item.part_of.group_name }}</a>
+          </dd>
+        </div>
+      {% endif %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Type</dt>
+        <dd class="govuk-summary-list__value">{{ item.type }}</dd>
+      </div>
+      {% if item.phase %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Phase of education</dt>
+          <dd class="govuk-summary-list__value">{{ item.phase }}</dd>
+        </div>
+      {% endif %}
+      {% if item.age_range %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Age range</dt>
+          <dd class="govuk-summary-list__value">{{ item.age_range }}</dd>
+        </div>
+      {% endif %}
+      {% if item.gender %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Gender</dt>
+          <dd class="govuk-summary-list__value">{{ item.gender }}</dd>
+        </div>
+      {% endif %}
+      {% if item.religious_character %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Religious character</dt>
+          <dd class="govuk-summary-list__value">{{ item.religious_character }}</dd>
+        </div>
+      {% endif %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Ofsted</dt>
+        <dd class="govuk-summary-list__value">
+          <a class="govuk-link" href="#" rel="noreferrer noopener" target="_blank">Inspection report (opens in new tab)</a>
+        </dd>
+      </div>
     {% endif %}
 
-    {% if item.id_type === 'UID' %}
-      <p class="govuk-body govuk-!-margin-top-6">
-        <a href="/school-profiles/about-the-school" class="govuk-link" target="_blank" rel="noopener noreferrer">
-          View more information about this group on School Profiles (opens in new tab)
-        </a>
-      </p>
-      <p class="govuk-body govuk-!-margin-top-6">
-        <a href="#" class="govuk-link" >
-          Download establishment group information
-        </a>
-      </p>
+  </dl>
+{% endset %}
+
+{#
+  ===========================================================================
+  GOVERNANCE PANEL
+  Providers: a single "Governors" table.
+  Groups: two tables — "Trustees" and "Members".
+  Falls back to a "no governance recorded" message when data is absent.
+  ===========================================================================
+#}
+{% set governanceHtml %}
+  {% if isGroup %}
+    <h2 class="govuk-heading-m">Trustees</h2>
+    {% if governance and governance.trustees_current.length > 0 %}
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Governor ID</th>
+            <th scope="col" class="govuk-table__header">Start date</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for p in governance.trustees_current %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ p.name }}{% if 'Chair' in p.role %} (Chair){% elif p.role !== 'Trustee' %} ({{ p.role }}){% endif %}</td>
+              <td class="govuk-table__cell">{{ p.gid }}</td>
+              <td class="govuk-table__cell">{{ p.appointed }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="govuk-body">No trustee information is currently recorded for this group.</p>
     {% endif %}
 
-    {% if predecessors.length > 0 %}
-      <h2 class="govuk-heading-m govuk-!-margin-top-6">History</h2>
-      <p class="govuk-body">The following establishments previously operated from this location and may be predecessor establishments:</p>
-      <dl class="govuk-summary-list">
-        {% for predecessor in predecessors %}
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-              <a class="govuk-link govuk-link--no-visited-state" href="/establishment/{{ predecessor.id }}?from=/establishment/{{ item.id }}">{{ predecessor.name }}</a>
-            </dt>
-            <dd class="govuk-summary-list__value">
-              {{ predecessor.type }}{% if predecessor.local_authority %} — {{ predecessor.local_authority }}{% endif %}
-            </dd>
-            <dd class="govuk-summary-list__value">
-              URN: {{ predecessor.id }}
-              {% if predecessor.close_date %} — Closed: {{ predecessor.close_date }}{% endif %}
-            </dd>
-          </div>
-        {% endfor %}
-      </dl>
+    <h2 class="govuk-heading-m govuk-!-margin-top-8">Members</h2>
+    {% if governance and governance.members_current.length > 0 %}
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Governor ID</th>
+            <th scope="col" class="govuk-table__header">Start date</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for p in governance.members_current %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ p.name }}</td>
+              <td class="govuk-table__cell">{{ p.gid }}</td>
+              <td class="govuk-table__cell">{{ p.appointed }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="govuk-body">No member information is currently recorded for this group.</p>
     {% endif %}
 
-    {% if members.length > 0 %}
-      <h2 class="govuk-heading-m govuk-!-margin-top-6">Member establishments ({{ members.length }})</h2>
-      <dl class="govuk-summary-list">
+  {% else %}
+    <h2 class="govuk-heading-m">Governors</h2>
+    {% if governance and governance.governors_current.length > 0 %}
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Governor ID</th>
+            <th scope="col" class="govuk-table__header">Start date</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for p in governance.governors_current %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ p.name }}{% if 'Chair' in p.role %} (Chair){% endif %}</td>
+              <td class="govuk-table__cell">{{ p.gid }}</td>
+              <td class="govuk-table__cell">{{ p.appointed }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="govuk-body">No governance information is currently recorded for this provider.</p>
+    {% endif %}
+  {% endif %}
+{% endset %}
+
+{#
+  ===========================================================================
+  ACADEMIES PANEL (groups only) — member establishments
+  ===========================================================================
+#}
+{% set academiesHtml %}
+  <h2 class="govuk-heading-m">Academies</h2>
+  {% if members.length > 0 %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Name</th>
+          <th scope="col" class="govuk-table__header">URN</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
         {% for member in members %}
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-              <a class="govuk-link govuk-link--no-visited-state" href="/establishment/{{ member.id }}?from=/establishment/{{ item.id }}">{{ member.name }}</a>
-            </dt>
-            <dd class="govuk-summary-list__value">
-              {{ member.type }}{% if member.local_authority %} — {{ member.local_authority }}{% endif %}
-            </dd>
-            <dd class="govuk-summary-list__value">
-              {{ member.id_type }}: {{ member.id }}
-            </dd>
-          </div>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <a class="govuk-link" href="/establishment/{{ member.id }}?from=/establishment/{{ item.id }}">{{ member.name }}</a>
+            </td>
+            <td class="govuk-table__cell">{{ member.id }}</td>
+          </tr>
         {% endfor %}
-      </dl>
-    {% endif %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No academies are currently recorded for this group.</p>
+  {% endif %}
+{% endset %}
 
+{#
+  ===========================================================================
+  HISTORY PANEL (providers only) — previously known as
+  ===========================================================================
+#}
+{% set historyHtml %}
+  <h2 class="govuk-heading-m">History</h2>
+  {% if predecessors.length > 0 %}
+    <p class="govuk-body">Previously known as</p>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Name</th>
+          <th scope="col" class="govuk-table__header">Type</th>
+          <th scope="col" class="govuk-table__header">URN</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for predecessor in predecessors %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <a class="govuk-link" href="/establishment/{{ predecessor.id }}?from=/establishment/{{ item.id }}">{{ predecessor.name }}</a>
+            </td>
+            <td class="govuk-table__cell">{{ predecessor.type }}</td>
+            <td class="govuk-table__cell">{{ predecessor.id }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No previous names are currently recorded for this provider.</p>
+  {% endif %}
+{% endset %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <div class="dfe-page-header">
+        <h1 class="govuk-heading-xl dfe-page-header__heading">{{ item.name }}</h1>
+        <div class="dfe-page-header__action">
+          {{ govukButton({
+            text: "Download information",
+            classes: "govuk-button--secondary",
+            href: "#"
+          }) }}
+        </div>
+      </div>
+
+      {% if isGroup %}
+        {{ govukTabs({
+          items: [
+            {
+              label: "Details",
+              id: "details",
+              panel: { html: detailsHtml }
+            },
+            {
+              label: "Academies (" + members.length + ")",
+              id: "academies",
+              panel: { html: academiesHtml }
+            },
+            {
+              label: "Governance",
+              id: "governance",
+              panel: { html: governanceHtml }
+            }
+          ]
+        }) }}
+      {% else %}
+        {{ govukTabs({
+          items: [
+            {
+              label: "Details",
+              id: "details",
+              panel: { html: detailsHtml }
+            },
+            {
+              label: "Governance",
+              id: "governance",
+              panel: { html: governanceHtml }
+            },
+            {
+              label: "History",
+              id: "history",
+              panel: { html: historyHtml }
+            }
+          ]
+        }) }}
+      {% endif %}
+
+    </div>
   </div>
-</div>
+
 {% endblock %}

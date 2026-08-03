@@ -1,5 +1,5 @@
 {
-  "serviceName": "GIAS Transformation",
+  "serviceName": "Find education provider information",
   "useServiceNavigation": true,
   "plugins": {
     "govuk-frontend": {
