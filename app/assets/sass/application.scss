@@ -1,131 +1,352 @@
 //
+// application.scss
 // For guidance on how to add CSS and SCSS see:
 // https://prototype-kit.service.gov.uk/docs/adding-css-javascript-and-images
-// 
+//
+// Structure:
+//   1. Setup & imports
+//   2. Shared utilities
+//   3. Header / branding
+//   4. Home page
+//   5. Search panel (search + results pages)
+//   6. Results page (header controls, filter sections)
+//   7. Establishment (detail page)
+//   8. Download flow (spinner)
+//   9. MoJ filter overrides
+//
 
-// Add extra styles here
+// ============================================================================
+// 1. Setup & imports
+// ============================================================================
+
 $govuk-suppressed-warnings: ("govuk-text-colour");
 
 @import 'node_modules/dfe-frontend/packages/dfefrontend';
-
-.govuk-width-container {
-    @include govuk-width-container;
-}
-
+@import 'node_modules/@x-govuk/govuk-prototype-components/dist/govuk-prototype-components.scss';
 @import url('https://rsms.me/inter/inter.css');
 $govuk-font-family: 'Inter', sans-serif;
 
-// Home link
-
-.home-link {
-  font-size: 1rem;
-  line-height: 1.25;
-  font-family: "GDS Transport", arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-decoration: underline;
-  text-decoration-thickness: max(1px, .0625rem);
-  text-underline-offset: 0.1578em;
-  display: block;
-  max-width: fit-content;
-  position: relative;
-  margin-top: 15px;
+.govuk-width-container {
+  @include govuk-width-container;
 }
 
-.home-link:link, .home-link:visited, .home-link:active {
-    color: var(--govuk-text-colour, #0b0c0c);
+// ============================================================================
+// 2. Shared utilities
+// ============================================================================
+
+// Inset yellow highlight
+.inset-yellow {
+  background-color: #fff3cd;
+  border-left: 10px solid #ffdd00;
+  margin-top: 0;
+  margin-bottom: 50px;
 }
 
-//
+// Inline list
+.inline-list {
+  display: inline-block;
+  margin-right: govuk-spacing(3);
+  margin-bottom: 0;
+}
 
-.tableNumbers{
-      font-feature-settings: 'tnum' 1, 'ss01' 1, 'zero' 1;
-  }
+// Remove bottom gap from a heading or text component
+.no-gap {
+  margin-bottom: 0;
+}
 
-.govuk-header__link .govuk-header__logotype{
+// Section with blue top border
+.top-border {
+  padding-top: 30px;
+  border-top: 2px solid #1d70b8;
+  margin-top: 60px;
+}
+
+// ============================================================================
+// 3. Header / branding
+// ============================================================================
+
+.govuk-header__link .govuk-header__logotype {
   height: 30px;
 }
 
-.govuk-header__link:focus .govuk-header__logotype{
+.govuk-header__link:focus .govuk-header__logotype {
   content: url(/public/images/department-for-education_black.png);
   height: 30px;
 }
 
-.section-break--blue {
-  border-bottom: 4px solid;
-  border-bottom-color: #1d70b8;
+// ============================================================================
+// 4. Home page
+// ============================================================================
+
+// Larger card headings
+.dfe-card .govuk-heading-m {
+  @include govuk-font-size($size: 36); // matches govuk-heading-l
 }
 
-// Search autocomplete - home page
+// Home page cards fill the full column width
 
-.search--home .autocomplete__input {
-  width: 100%;
-  height: 50px;
-  font-size: 1.1875rem;
+.dfe-home-cards {
+  // Remove .dfe-width-container padding
+  .dfe-width-container {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    .dfe-grid-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .dfe-card {
+    max-width: none;
+    background-color: govuk-colour("blue", $variant: "tint-80");
+    border-color: govuk-colour("blue", $variant: "tint-80");
+  }
+
+  .dfe-card:hover, .dfe-card:focus-within {
+    background-color: govuk-colour("blue", $variant: "shade-50");
+    border-color: govuk-colour("blue", $variant: "shade-50");
+  }
 }
 
-.search--home #search-autocomplete-container {
-  flex: 1;
+// Quick search links
+.dfe-quick-search-list {
+  margin-bottom: govuk-spacing(4);
 }
 
-.search--home .govuk-input__wrapper {
-  width: 100%;
+.dfe-quick-search-list li {
+  display: inline-block;
+  margin-right: govuk-spacing(6);
+  margin-bottom: govuk-spacing(2);
 }
 
-.search__wrapper {
+.dfe-quick-search-list__chevron {
+  margin-left: govuk-spacing(1);
+  vertical-align: middle;
+}
+
+// ============================================================================
+// 5. Search panel (used on the Search page and the Results page)
+// ============================================================================
+
+.dfe-search-panel {
+  padding: govuk-spacing(4);
+  background-color: govuk-colour("blue", $variant: "tint-80");
+
+  @include govuk-media-query($from: tablet) {
+    padding: govuk-spacing(6);
+  }
+}
+
+// Checkbox left, Search button right, on one row.
+.dfe-search-panel__actions {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: govuk-spacing(4);
+  margin-top: govuk-spacing(4); // controlled gap above the actions row
+}
 
-  #search-autocomplete-container {
-    flex: 1;
-  }
+// Keep checkbox boxes white inside the shaded (blue) panel.
+.dfe-search-panel .govuk-checkboxes__input + .govuk-checkboxes__label::before {
+  background-color: govuk-colour("white");
+}
 
-  .govuk-button {
-    margin-bottom: 0;
+// Remove the default form-group bottom margin inside the panel.
+.dfe-search-panel .govuk-form-group {
+  margin-bottom: 0;
+}
+
+// ============================================================================
+// 6. Results page — header controls and filter sections
+// ============================================================================
+
+// "N results" wrapper above the controls row.
+.dfe-results-header {
+  margin-bottom: govuk-spacing(2);
+}
+
+// Sort + Download row, sitting above the result cards.
+.dfe-results-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: govuk-spacing(4);
+  margin-bottom: govuk-spacing(4);
+}
+
+.dfe-results-sort {
+  display: flex;
+  align-items: flex-end;
+  gap: govuk-spacing(2);
+}
+
+.dfe-results-sort__label {
+  margin-bottom: govuk-spacing(1);
+}
+
+.dfe-results-sort__select {
+  margin-bottom: 0;
+}
+
+.dfe-results-download {
+  margin-left: auto;
+}
+
+// Autocomplete filter facet (Local authority, Diocese) container.
+.dfe-autocomplete {
+  max-width: 100%;
+}
+
+// Filter sections — restyle native <details> to match the FIPS / Figma look.
+// GOV.UK Frontend v6 styles <details> summaries as links with their own
+// absolutely-positioned arrow (::before). We override that so each summary is a
+// full-width heading-style toggle with a chevron on the right, while keeping
+// native <details> behaviour (works without JS, correct accessibility for free).
+
+.dfe-filter-section {
+  margin-bottom: 0;
+  border-top: 1px solid $govuk-border-colour;
+
+  &:last-of-type {
+    border-bottom: 1px solid $govuk-border-colour;
   }
 }
 
-// Filters
+.dfe-filter-section > .govuk-details__summary {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: govuk-spacing(2) 0;
+  color: $govuk-text-colour;
+  font-weight: bold;
+  cursor: pointer;
 
+  &:hover {
+    color: $govuk-text-colour;
+  }
+
+  // Remove GOV.UK's absolutely-positioned ::before arrow.
+  &::before {
+    content: none;
+    display: none;
+  }
+
+  // Remove the native disclosure marker.
+  &::-webkit-details-marker {
+    display: none;
+  }
+  list-style: none;
+
+  // Our own chevron on the right, pointing down when closed.
+  &::after {
+    content: "";
+    display: inline-block;
+    flex: 0 0 auto;
+    margin-left: govuk-spacing(2);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid $govuk-text-colour;
+    transition: transform 0.1s ease-in-out;
+  }
+}
+
+// Remove the underline GOV.UK adds to the summary text.
+.dfe-filter-section > .govuk-details__summary .govuk-details__summary-text {
+  text-decoration: none;
+}
+
+// Chevron points up when open.
+.dfe-filter-section[open] > .govuk-details__summary::after {
+  transform: rotate(180deg);
+}
+
+// Panel content sits flush — remove GOV.UK's left border and indent.
+.dfe-filter-section > .govuk-details__text {
+  border-left: none;
+  padding: 0 0 govuk-spacing(3) 0;
+  margin-left: 0;
+}
+
+// ============================================================================
+// 7. Establishment (detail page)
+// ============================================================================
+
+// Title row: H1 left, "Download information" button right.
+.dfe-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: govuk-spacing(4);
+}
+
+.dfe-page-header__heading {
+  margin-bottom: govuk-spacing(4);
+}
+
+.dfe-page-header__action {
+  flex: 0 0 auto;
+}
+
+// Tabular figures for ID / number columns.
+.tableNumbers {
+  font-feature-settings: 'tnum' 1, 'ss01' 1, 'zero' 1;
+}
+
+// ============================================================================
+// 8. Download flow (spinner)
+// ============================================================================
+
+.dfe-download-status {
+  margin-top: govuk-spacing(6);
+  text-align: center;
+}
+
+.dfe-download-status__text {
+  margin-bottom: govuk-spacing(6);
+}
+
+// Decorative spinner — marked aria-hidden in the template, so it is never
+// announced; the status text carries the meaning.
+.dfe-spinner {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  border: 6px solid govuk-colour("light-grey");
+  border-top-color: govuk-colour("blue");
+  border-radius: 50%;
+}
+
+// Only animate when the user has not asked for reduced motion.
+@media (prefers-reduced-motion: no-preference) {
+  .dfe-spinner {
+    animation: dfe-spin 1s linear infinite;
+  }
+}
+
+@keyframes dfe-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// ============================================================================
+// 9. MoJ filter overrides
+// ============================================================================
+
+// Repoint the selected-filter tag remove-cross to local images.
 .moj-filter__tag::after {
   background-image: url('/public/images/icon-tag-remove-cross.svg');
 }
 
 .moj-filter__tag:hover::after {
   background-image: url('/public/images/icon-tag-remove-cross-white.svg');
-}
-
-// Small tag
-
-.small-tag {
-  font-family: "GDS Transport", arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1;
-  color: #0f385c;
-  background-color: #d2e2f1;
-  display: block;
-  max-width: fit-content;
-  margin-top: 0;
-  margin-bottom: 5px;
-  padding-top: 3px;
-  padding-right: 8px;
-  padding-bottom: 3px;
-  padding-left: 8px;
-  border-radius: 1px;
-  text-decoration: none;
-  overflow-wrap: break-word;
-}
-
-.small-tag--green {
-    color: #083d29;
-    background-color: #cfe4dc;
-}
-
-.small-tag--yellow {
-    color: #7a3c1c;
-    background-color: #ffee80;
 }

@@ -1,0 +1,222 @@
+{% extends "layouts/main.html" %}
+
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageName = "Download" %}
+{% set activeNav = "Download" %}
+
+{#
+  Build the "Select specific data" reveal as a variable so the radios call
+  below stays readable. It contains an instruction plus three separate
+  checkbox fieldsets (providers / provider groups / governance), each with
+  its own legend so every checkbox is bound to a named group — the
+  accessible way to sub-group a long checkbox list.
+#}
+{% set specificDataHtml %}
+  <p class="govuk-body">Select all the data you need</p>
+
+  {{ govukCheckboxes({
+    name: "provider-data",
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: "Education providers",
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    items: [
+      { value: "open-provider", text: "Open education provider data (51.52 MB)" },
+      { value: "closed-provider", text: "Closed education provider data (12 MB)" },
+      { value: "open-academies-free", text: "Open academies and free schools data (5.84 MB)" },
+      { value: "open-state-funded", text: "Open state-funded schools data (9.85 MB)" },
+      { value: "open-childrens-centres", text: "Open children’s centres data (0.85 MB)" }
+    ]
+  }) }}
+
+  {{ govukCheckboxes({
+    name: "provider-group-data",
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: "Education provider groups",
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    items: [
+      { value: "open-provider-group", text: "Open education provider group data (16.15 MB)" },
+      { value: "closed-provider-group", text: "Closed education provider group data (5.2 MB)" }
+    ]
+  }) }}
+
+  {{ govukCheckboxes({
+    name: "governance-data",
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: "Governance",
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    items: [
+      { value: "all-governor", text: "All Governor data (64.9 MB)" }
+    ]
+  }) }}
+{% endset %}
+
+{#
+  Reveal for "Updates only": date input, updates since and including this date.
+#}
+{% set updatesDateHtml %}
+  {{ govukDateInput({
+    id: "updates-date",
+    namePrefix: "updates-date",
+    fieldset: {
+      legend: {
+        text: "Updates since and including this date",
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    hint: {
+      text: "For example, 27 3 2026"
+    }
+  }) }}
+{% endset %}
+
+{#
+  Reveal for "Version from an earlier date": date input.
+#}
+{% set earlierDateHtml %}
+  {{ govukDateInput({
+    id: "earlier-date",
+    namePrefix: "earlier-date",
+    fieldset: {
+      legend: {
+        text: "The register as it stood on this date",
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    hint: {
+      text: "For example, 27 3 2026"
+    }
+  }) }}
+{% endset %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Download information</h1>
+
+      <p class="govuk-body-l">
+        Download data from the register to use in your own analysis or systems.
+      </p>
+
+      {{ govukInsetText({
+        text: "Register last updated 7 July 2026"
+      }) }}
+
+      {#
+        The form POSTs to /download/start. The prototype kit saves all posted
+        fields into session data automatically, so the confirmation page can
+        read the user's selections. The route then redirects to /downloading
+        (POST-redirect-GET), which avoids the browser "resend form?" prompt.
+      #}
+      <form method="post" action="/download/start" novalidate>
+
+        {{ govukRadios({
+          name: "download-scope",
+          fieldset: {
+            legend: {
+              text: "What do you want to download?",
+              classes: "govuk-fieldset__legend--m",
+              isPageHeading: false
+            }
+          },
+          items: [
+            {
+              value: "all",
+              text: "All information (345 MB)"
+            },
+            {
+              value: "specific",
+              text: "Select specific data",
+              conditional: {
+                html: specificDataHtml
+              }
+            },
+            {
+              value: "updates",
+              text: "Updates only",
+              conditional: {
+                html: updatesDateHtml
+              }
+            }
+          ]
+        }) }}
+
+        <div id="download-version-question">
+          {{ govukRadios({
+            name: "download-version",
+            fieldset: {
+              legend: {
+                text: "Which version of the information do you want to download?",
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+              }
+            },
+            items: [
+              {
+                value: "latest",
+                text: "Latest version (updated 13 July 2026)"
+              },
+              {
+                value: "earlier",
+                text: "Version from an earlier date",
+                conditional: {
+                  html: earlierDateHtml
+                }
+              }
+            ]
+          }) }}
+        </div>
+
+        {{ govukRadios({
+          name: "download-format",
+          fieldset: {
+            legend: {
+              text: "What format do you want to download in?",
+              classes: "govuk-fieldset__legend--m",
+              isPageHeading: false
+            }
+          },
+          items: [
+            {
+              value: "csv",
+              text: "CSV"
+            },
+            {
+              value: "json",
+              text: "JSON"
+            },
+            {
+              value: "xlsx",
+              text: "XLSX (Excel)"
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Download file"
+        }) }}
+
+      </form>
+
+    </div>
+  </div>
+
+{% endblock %}

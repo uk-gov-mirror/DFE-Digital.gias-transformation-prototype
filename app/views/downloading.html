@@ -1,0 +1,73 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName = "Downloading" %}
+{% set activeNav = "Download" %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-xl">Downloading from the register</h1>
+
+      {#
+        Accessible loading state
+        ------------------------
+        - The status text is the source of truth. It lives in a container with
+          role="status" and aria-live="polite", so when the message changes,
+          assistive tech announces the new text without moving focus.
+        - The spinner graphic is decorative only: aria-hidden="true". A screen
+          reader never announces the spinner — only the text.
+        - JavaScript advances the page: after 3 seconds the text changes to
+          "File ready", the spinner is hidden, then after 1 more second the
+          page moves to the confirmation. This uses a timer, not a meta
+          refresh (meta refresh fails WCAG 2.2.1 as the user cannot control
+          the timing).
+        - If JavaScript is off, the <noscript> link lets the user continue
+          manually, so no one is stranded.
+      #}
+
+      <div class="dfe-download-status">
+
+        <p class="govuk-body-l dfe-download-status__text" id="download-status" role="status" aria-live="polite">
+          Preparing file for download …
+        </p>
+
+        <div class="dfe-spinner" id="download-spinner" aria-hidden="true"></div>
+
+      </div>
+
+      <noscript>
+        <p class="govuk-body">
+          <a class="govuk-link" href="/download-complete">Continue to confirmation</a>
+        </p>
+      </noscript>
+
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    (function () {
+      // Progressive enhancement: only runs if JS is available.
+      var statusEl = document.getElementById('download-status')
+      var spinnerEl = document.getElementById('download-spinner')
+
+      if (!statusEl) { return }
+
+      // After 3 seconds: file is "ready", hide the spinner, update the text.
+      window.setTimeout(function () {
+        statusEl.textContent = 'File ready, downloading …'
+        if (spinnerEl) { spinnerEl.hidden = true }
+
+        // After 1 more second: move to the confirmation page.
+        window.setTimeout(function () {
+          window.location.href = '/download-complete'
+        }, 1000)
+      }, 3000)
+    })()
+  </script>
+{% endblock %}
