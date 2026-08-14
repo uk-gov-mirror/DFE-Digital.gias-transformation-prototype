@@ -29,47 +29,38 @@
         <p class="govuk-body govuk-!-margin-bottom-4">Use one or both fields to search</p>
 
         <div class="govuk-grid-row">
+
           <div class="govuk-grid-column-one-half">
             {{ govukInput({
               label: {
-                text: "What",
+                text: "Enter a name or ID number",
                 classes: "govuk-label--s"
               },
               hint: {
-                text: "Enter a name or ID number"
+                text: "For example, a school or trust name, UKPRN or DfE number."
               },
               id: "search-what",
               name: "q"
-            }) }}
+          }) }}
           </div>
+
           <div class="govuk-grid-column-one-half">
             {{ govukInput({
               label: {
-                text: "Where",
+                text: "Enter a location",
                 classes: "govuk-label--s"
               },
               hint: {
-                text: "Enter a postcode, city or local authority"
+                text: "For example, a postcode, city or local authority."
               },
               id: "search-where",
               name: "where"
             }) }}
           </div>
+          
         </div>
 
         <div class="dfe-search-panel__actions">
-          {{ govukCheckboxes({
-            classes: "govuk-!-margin-bottom-0",
-            name: "open-only",
-            items: [
-              {
-                value: "open-only",
-                text: "Show open providers only",
-                checked: true
-              }
-            ]
-          }) }}
-
           {{ govukButton({
             text: "Search",
             classes: "govuk-!-margin-bottom-0"
@@ -84,7 +75,7 @@
   <div class="govuk-grid-row govuk-!-margin-bottom-4">
     <div class="govuk-grid-column-full">
 
-      <h2 class="govuk-heading-m">Quick search</h2>
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-1">Quick search</h2>
 
       <ul class="govuk-list govuk-!-margin-bottom-0 dfe-quick-search-list">
         <li>
@@ -97,7 +88,7 @@
         </li>
         <li>
           <a class="govuk-link govuk-link--no-visited-state" href="/results?q=*&amp;kind=provider">
-            Education providers only (schools, academies, etc.)
+            Show education providers only
             <svg class="dfe-quick-search-list__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 17 17" aria-hidden="true" focusable="false">
               <path d="M0 0h13l20 20-20 20H0l20-20z" fill="currentColor" transform="scale(0.4)" />
             </svg>
@@ -105,7 +96,7 @@
         </li>
         <li>
           <a class="govuk-link govuk-link--no-visited-state" href="/results?q=*&amp;kind=group">
-            Provider groups only (Trusts, foundations, etc.)
+            Show provider groups only
             <svg class="dfe-quick-search-list__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 17 17" aria-hidden="true" focusable="false">
               <path d="M0 0h13l20 20-20 20H0l20-20z" fill="currentColor" transform="scale(0.4)" />
             </svg>

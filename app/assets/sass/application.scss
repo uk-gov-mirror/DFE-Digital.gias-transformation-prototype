@@ -350,3 +350,34 @@ $govuk-font-family: 'Inter', sans-serif;
 .moj-filter__tag:hover::after {
   background-image: url('/public/images/icon-tag-remove-cross-white.svg');
 }
+
+// ============================================================================
+// 10. Establishment details — grouped "ID numbers" sub-list
+// ============================================================================
+
+// Renders LAESTAB / UKPRN / URN as an aligned key/value pair inside a single
+// summary-list row, matching the establishment-page-reorder design.
+.dfe-id-numbers {
+  margin: 0;
+}
+
+.dfe-id-numbers__row {
+  display: flex;
+  gap: govuk-spacing(4);
+
+  & + & {
+    margin-top: govuk-spacing(1);
+  }
+}
+
+.dfe-id-numbers__key {
+  @include govuk-font($size: 19);
+  margin: 0;
+  min-width: 80px;
+  flex: 0 0 auto;
+}
+
+.dfe-id-numbers__value {
+  @include govuk-font($size: 19);
+  margin: 0;
+}
