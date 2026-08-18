@@ -81,6 +81,7 @@ router.get('/api/schools', function (req, res) {
 // Results page
 router.get('/results', function (req, res) {
   var q = (req.query.q || '').trim()
+  var where = (req.query.where || '').trim()
   var exactId = (req.query.id || '').trim()
   var currentPage = parseInt(req.query.page) || 1
 
@@ -120,22 +121,48 @@ router.get('/results', function (req, res) {
   // Base search against active data only
   var searchResults = []
 
+  // Two independent text predicates, combined with AND:
+  //  - q     matches name and ID codes only ("what")
+  //  - where matches location fields: postcode, town, county, LA, street
+  // Either can be used alone; when both are present a record must match both.
+  // "Show all" only applies when neither field is used (q is empty or '*').
+  var qLower = q.toLowerCase()
+  var whereLower = where.toLowerCase()
+
+  function matchesQ(item) {
+    return (
+      (item.name && item.name.toLowerCase().indexOf(qLower) !== -1) ||
+      (item.id && item.id.toLowerCase().indexOf(qLower) !== -1) ||
+      (item.ukprn && item.ukprn.toLowerCase().indexOf(qLower) !== -1) ||
+      (item.dfe_number && item.dfe_number.toLowerCase().indexOf(qLower) !== -1) ||
+      (item.part_of && item.part_of.group_name && item.part_of.group_name.toLowerCase().indexOf(qLower) !== -1) ||
+      (item.part_of && item.part_of.group_uid && item.part_of.group_uid.toLowerCase().indexOf(qLower) !== -1)
+    )
+  }
+
+  function matchesWhere(item) {
+    return (
+      (item.postcode && item.postcode.toLowerCase().indexOf(whereLower) !== -1) ||
+      (item.town && item.town.toLowerCase().indexOf(whereLower) !== -1) ||
+      (item.county && item.county.toLowerCase().indexOf(whereLower) !== -1) ||
+      (item.local_authority && item.local_authority.toLowerCase().indexOf(whereLower) !== -1) ||
+      (item.street && item.street.toLowerCase().indexOf(whereLower) !== -1)
+    )
+  }
+
+  var hasQ = q.length > 0 && q !== '*'
+  var hasWhere = where.length > 0
+
   if (exactId) {
-  searchResults = allData.filter(function (item) {
-    return item.id === exactId
-  })
-} else if (q === '*' || q.length === 0) {
-  searchResults = allData
-} else if (q.length > 0) {
-    var qLower = q.toLowerCase()
     searchResults = allData.filter(function (item) {
-      return (
-        (item.name && item.name.toLowerCase().indexOf(qLower) !== -1) ||
-        (item.id && item.id.toLowerCase().indexOf(qLower) !== -1) ||
-        (item.local_authority && item.local_authority.toLowerCase().indexOf(qLower) !== -1) ||
-        (item.part_of && item.part_of.group_name && item.part_of.group_name.toLowerCase().indexOf(qLower) !== -1) ||
-        (item.part_of && item.part_of.group_uid && item.part_of.group_uid.toLowerCase().indexOf(q) !== -1)
-      )
+      return item.id === exactId
+    })
+  } else if (!hasQ && !hasWhere) {
+    // No search terms (fresh load or explicit '*') — show everything
+    searchResults = allData
+  } else {
+    searchResults = allData.filter(function (item) {
+      return (!hasQ || matchesQ(item)) && (!hasWhere || matchesWhere(item))
     })
   }
 
@@ -380,6 +407,7 @@ router.get('/results', function (req, res) {
     hasActiveFilters: hasActiveFilters,
     clearFiltersHref: buildClearFiltersUrl(req),
     searchQ: q,
+    searchWhere: where,
     searchId: exactId,
     currentUrl: req.originalUrl
   })

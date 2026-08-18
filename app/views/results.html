@@ -163,6 +163,7 @@
         {% elif searchQ %}
           <input type="hidden" name="q" value="{{ searchQ }}">
         {% endif %}
+        {% if searchWhere %}<input type="hidden" name="where" value="{{ searchWhere }}">{% endif %}
         {% if sortOrder and sortOrder !== 'az' %}
           <input type="hidden" name="sort" value="{{ sortOrder }}">
         {% endif %}
@@ -200,6 +201,7 @@
         <div class="dfe-results-controls">
           <form method="get" action="/results" class="dfe-results-sort">
             {% if searchId %}<input type="hidden" name="id" value="{{ searchId }}">{% elif searchQ %}<input type="hidden" name="q" value="{{ searchQ }}">{% endif %}
+            {% if searchWhere %}<input type="hidden" name="where" value="{{ searchWhere }}">{% endif %}
             {% if kind %}<input type="hidden" name="kind" value="{{ kind }}">{% endif %}
             {{ govukSelect({
               id: "sort",
