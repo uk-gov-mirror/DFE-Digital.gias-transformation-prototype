@@ -80,7 +80,7 @@ router.get('/api/schools', function (req, res) {
 
 // Results page
 router.get('/results', function (req, res) {
-  var q = (req.query.q || '').trim()
+  var q = (req.query.what || '').trim()
   var where = (req.query.where || '').trim()
   var exactId = (req.query.id || '').trim()
   var currentPage = parseInt(req.query.page) || 1
@@ -103,20 +103,9 @@ router.get('/results', function (req, res) {
   // Sort order: 'az' (default) or 'za'
   var sortOrder = (req.query.sort === 'za') ? 'za' : 'az'
 
-  // "Show open providers only" toggle. When on, results are constrained to
-  // open records and this overrides the Status filter (the toggle wins).
-  //
-  // The GOV.UK checkbox posts 'open-only' when ticked, or '_unchecked' when the
-  // form is submitted with it unticked. On a fresh page load with no query at
-  // all, it defaults to on (matching the ticked-by-default design).
-  var openOnlyRaw = [].concat(req.query['open-only'] || [])
-  var formSubmitted = Object.keys(req.query).length > 0
-  var openOnly
-  if (!formSubmitted) {
-    openOnly = true // default state on a fresh search
-  } else {
-    openOnly = openOnlyRaw.indexOf('open-only') !== -1
-  }
+  // Status is an explicit filter only. Search returns records of all statuses
+  // (Open, Closed, Proposed to open, etc.) unless the user ticks specific
+  // statuses in the Status filter. There is no "open only" default.
 
   // Base search against active data only
   var searchResults = []
@@ -195,10 +184,8 @@ router.get('/results', function (req, res) {
     // Record kind: provider = URN, group = UID / Group UID.
     if (kind === 'provider' && item.id_type !== 'URN') return false
     if (kind === 'group' && item.id_type !== 'UID' && item.id_type !== 'Group UID') return false
-    // "Show open providers only" wins over the Status filter when on.
-    if (openOnly) {
-      if (item.status === 'Closed') return false
-    } else if (activeStatuses.length > 0 && activeStatuses.indexOf(item.status) === -1) {
+    // Status filter: only applies when the user has ticked one or more statuses.
+    if (activeStatuses.length > 0 && activeStatuses.indexOf(item.status) === -1) {
       return false
     }
     if (activeTypes.length > 0 && activeTypes.indexOf(item.type) === -1) return false
@@ -401,7 +388,6 @@ router.get('/results', function (req, res) {
     activeLAs: activeLAs,
     activeDioceses: activeDioceses,
     sortOrder: sortOrder,
-    openOnly: openOnly,
     kind: kind,
     selectedCategories: selectedCategories,
     hasActiveFilters: hasActiveFilters,
@@ -451,7 +437,7 @@ router.get('/establishment/:id', function (req, res) {
 
 // View all establishments
 router.get('/all', function (req, res) {
-  res.redirect('/results?q=*')
+  res.redirect('/results?what=*')
 })
 
 
@@ -488,7 +474,8 @@ function buildRemoveFilterUrl (req, filterKey, filterValue) {
 
 function buildClearFiltersUrl (req) {
   var params = {}
-  if (req.query.q) params.q = req.query.q
+  if (req.query.what) params.what = req.query.what
+  if (req.query.where) params.where = req.query.where
   if (req.query.id) params.id = req.query.id
   var qs = Object.keys(params).map(function (k) {
     return encodeURIComponent(k) + '=' + encodeURIComponent(params[k])

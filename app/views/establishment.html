@@ -9,6 +9,19 @@
 
 {% set isGroup = (item.id_type === 'UID' or item.id_type === 'Group UID') %}
 
+{#
+  statusTag — renders a GOV.UK tag for statuses that have one, otherwise the
+  plain status text. Extend the mapping here when status_detail is introduced
+  (e.g. "Proposed to convert to academy" -> govuk-tag--yellow).
+#}
+{% macro statusTag(status) %}
+  {% if status == "Closed" %}
+    <strong class="govuk-tag govuk-tag--grey">Closed</strong>
+  {% else %}
+    {{ status }}
+  {% endif %}
+{% endmacro %}
+
 {% block beforeContent %}
   {{ govukBreadcrumbs({
     items: [
@@ -59,7 +72,7 @@
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Status</dt>
         <dd class="govuk-summary-list__value">
-          {{ item.status }}{% if item.open_date %} on {{ item.open_date }}{% endif %}
+          {{ statusTag(item.status) }}{% if item.status == "Closed" and item.close_date %} {{ item.close_date | govukDate }}{% elif item.open_date %} on {{ item.open_date }}{% endif %}
         </dd>
       </div>
       {% if item.postcode or item.street or item.town %}
@@ -84,7 +97,7 @@
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Status</dt>
         <dd class="govuk-summary-list__value">
-          {{ item.status }}{% if item.open_date %} on {{ item.open_date }}{% endif %}
+          {{ statusTag(item.status) }}{% if item.status == "Closed" and item.close_date %} {{ item.close_date | govukDate }}{% elif item.open_date %} on {{ item.open_date }}{% endif %}
         </dd>
       </div>
 

@@ -97,42 +97,31 @@
   </h1>
 
   {#
-    Search panel — visual match to the Search page. For this pass the search
-    still runs on the single "q" term underneath; the "Where" field is present
-    but its location logic is wired in the next pass.
+    Search panel — content and behaviour match the Search page. "What" maps to
+    the q term (name / ID codes / group); "Where" maps to location fields
+    (postcode, town, county, local authority, street). Both are wired in the route.
   #}
   <form method="get" action="/results" class="dfe-search-panel govuk-!-margin-bottom-6">
     {% if kind %}<input type="hidden" name="kind" value="{{ kind }}">{% endif %}
+    <p class="govuk-body govuk-!-margin-bottom-4">Use one or both fields to search</p>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
         <div class="govuk-form-group">
-          <label class="govuk-label govuk-label--s" for="what">What</label>
-          <div id="what-hint" class="govuk-hint">Enter a name or ID number</div>
-          <input class="govuk-input" id="what" name="q" type="text" value="{{ searchQ if searchQ !== '*' else '' }}" aria-describedby="what-hint">
+          <label class="govuk-label govuk-label--s" for="what">Enter a name or ID number</label>
+          <div id="what-hint" class="govuk-hint">For example, a school or trust name, UKPRN or DfE number.</div>
+          <input class="govuk-input" id="what" name="what" type="text" value="{{ searchQ if searchQ !== '*' else '' }}" aria-describedby="what-hint">
         </div>
       </div>
       <div class="govuk-grid-column-one-half">
         <div class="govuk-form-group">
-          <label class="govuk-label govuk-label--s" for="where">Where</label>
-          <div id="where-hint" class="govuk-hint">Enter a postcode, city or local authority</div>
+          <label class="govuk-label govuk-label--s" for="where">Enter a location</label>
+          <div id="where-hint" class="govuk-hint">For example, a postcode, city or local authority.</div>
           <input class="govuk-input" id="where" name="where" type="text" value="{{ searchWhere }}" aria-describedby="where-hint">
         </div>
       </div>
     </div>
 
     <div class="dfe-search-panel__actions">
-      {{ govukCheckboxes({
-        classes: "govuk-checkboxes--small govuk-!-margin-bottom-0",
-        name: "open-only",
-        items: [
-          {
-            value: "open-only",
-            text: "Show open providers only",
-            checked: openOnly if openOnly !== undefined else true
-          }
-        ]
-      }) }}
-
       {{ govukButton({
         text: "Search",
         classes: "govuk-!-margin-bottom-0"
@@ -161,7 +150,7 @@
         {% if searchId %}
           <input type="hidden" name="id" value="{{ searchId }}">
         {% elif searchQ %}
-          <input type="hidden" name="q" value="{{ searchQ }}">
+          <input type="hidden" name="what" value="{{ searchQ }}">
         {% endif %}
         {% if searchWhere %}<input type="hidden" name="where" value="{{ searchWhere }}">{% endif %}
         {% if sortOrder and sortOrder !== 'az' %}
@@ -200,7 +189,7 @@
 
         <div class="dfe-results-controls">
           <form method="get" action="/results" class="dfe-results-sort">
-            {% if searchId %}<input type="hidden" name="id" value="{{ searchId }}">{% elif searchQ %}<input type="hidden" name="q" value="{{ searchQ }}">{% endif %}
+            {% if searchId %}<input type="hidden" name="id" value="{{ searchId }}">{% elif searchQ %}<input type="hidden" name="what" value="{{ searchQ }}">{% endif %}
             {% if searchWhere %}<input type="hidden" name="where" value="{{ searchWhere }}">{% endif %}
             {% if kind %}<input type="hidden" name="kind" value="{{ kind }}">{% endif %}
             {{ govukSelect({
@@ -237,6 +226,11 @@
               <h2 class="govuk-summary-card__title govuk-heading-s govuk-!-margin-bottom-0">
                 <a class="govuk-link" href="/establishment/{{ item.id }}?from={{ currentUrl | urlencode }}">{{ item.name }}</a>
               </h2>
+              {% if item.status == "Closed" %}
+                <div class="govuk-summary-card__actions">
+                  <strong class="govuk-tag govuk-tag--grey">Closed</strong>
+                </div>
+              {% endif %}
             </div>
             <div class="govuk-summary-card__content">
               <dl class="govuk-summary-list">

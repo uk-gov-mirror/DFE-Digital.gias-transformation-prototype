@@ -12,6 +12,11 @@ const addFilter = govukPrototypeKit.views.addFilter
 const moment = require('moment')
 
 addFilter('govukDate', function (date) {
-  const d = (date === 'now' || !date) ? moment() : moment(date)
-  return d.format('D MMMM YYYY')
+  if (date === 'now' || !date) {
+    return moment().format('D MMMM YYYY')
+  }
+  // GIAS dates are day-first: 'DD-MM-YYYY' or 'DD/MM/YYYY'. Also accept ISO
+  // ('YYYY-MM-DD') for any other sources. strict parsing avoids misreads.
+  const d = moment(date, ['DD-MM-YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', moment.ISO_8601], true)
+  return d.isValid() ? d.format('D MMMM YYYY') : date
 })
